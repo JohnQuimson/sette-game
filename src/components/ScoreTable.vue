@@ -11,37 +11,45 @@ const allTurns = computed(() => {
   return [...firstPhase, ...secondPhase];
 });
 
-// Tabella: punti solo per turni già giocati
+// Tabella: punti cumulativi per turni già giocati
 const tableData = computed(() => {
-  const data = allTurns.value.map((turn, index) => {
-    const rowPoints = game.players.map((player) => {
-      return player.turns?.[index] ?? ''; // vuoto se turno non ancora giocato
+  const data = [];
+  const cumulative = game.players.map(() => 0); // array cumulativo per giocatori
+
+  allTurns.value.forEach((turn, index) => {
+    const rowPoints = game.players.map((player, i) => {
+      const pointsThisTurn = player.turns?.[index];
+      if (pointsThisTurn !== undefined && pointsThisTurn !== null) {
+        cumulative[i] += pointsThisTurn; // somma cumulativa
+        return cumulative[i];
+      }
+      return ''; // turno non ancora giocato
     });
-    return { turn, points: rowPoints };
+
+    data.push({ turn, points: rowPoints });
   });
 
-  // Riorganizzo in ordine decrescente: 7→1 prima fase, poi 1→7 seconda fase
-  const firstPhaseRows = data.slice(0, 7); // 7→1
-  const secondPhaseRows = data.slice(7); // 1→7
-  return [...firstPhaseRows, ...secondPhaseRows];
+  return data;
 });
 </script>
 
 <template>
-  <table border="1" cellpadding="6" cellspacing="0">
-    <thead>
-      <tr>
-        <th>Turno</th>
-        <th v-for="player in game.players" :key="player.id">
-          {{ player.name }}
-        </th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr v-for="(row, idx) in tableData" :key="idx">
-        <td>{{ row.turn }}</td>
-        <td v-for="(point, i) in row.points" :key="i">{{ point }}</td>
-      </tr>
-    </tbody>
-  </table>
+  <div class="table-responsive">
+    <table class="table table-bordered text-center">
+      <thead class="table-dark">
+        <tr>
+          <th>Turno</th>
+          <th v-for="player in game.players" :key="player.id">
+            {{ player.name }}
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="(row, idx) in tableData" :key="idx">
+          <td>{{ row.turn }}</td>
+          <td v-for="(point, i) in row.points" :key="i">{{ point }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </template>

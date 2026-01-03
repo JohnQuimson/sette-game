@@ -28,55 +28,71 @@ function endTurn() {
 </script>
 
 <template>
-  <h2>Risultato turno</h2>
+  <div class="container py-5">
+    <h2>Risultato turno {{ game.currentTurnNumber }}</h2>
+    <ScoreTable />
 
-  <ScoreTable />
+    <div class="mt-4" v-for="player in game.players" :key="player.id">
+      <div class="card mb-3">
+        <div class="card-body">
+          <h5 class="card-title">{{ player.name }}</h5>
+          <p>
+            Dichiarate: <strong>{{ player.declared }}</strong>
+          </p>
+          <div class="mb-2">
+            <button
+              class="btn btn-success me-2"
+              @click="game.setResult(player.id, true)"
+            >
+              ✔ Giusto
+            </button>
+            <button
+              class="btn btn-danger"
+              @click="game.setResult(player.id, false)"
+            >
+              ✖ Sbagliato
+            </button>
+          </div>
 
-  <div
-    v-for="player in game.players"
-    :key="player.id"
-    style="margin-bottom: 12px"
-  >
-    <strong>{{ player.name }}</strong>
+          <!-- SOLO SE SBAGLIATO -->
+          <div v-if="player.resultCorrect === false" class="mb-2">
+            <label class="form-label">
+              Prese fatte:
+              <input
+                class="form-control"
+                type="number"
+                min="0"
+                :max="game.currentCards"
+                v-model.number="player.taken"
+              />
+            </label>
+          </div>
 
-    <p>
-      Dichiarate: <strong>{{ player.declared }}</strong>
+          <!-- FEEDBACK -->
+          <p v-if="player.resultCorrect === true" class="text-success fw-bold">
+            ✅ Presa giusta
+          </p>
+          <p v-if="player.resultCorrect === false" class="text-danger fw-bold">
+            ❌ Presa sbagliata
+          </p>
+        </div>
+      </div>
+
+      <!-- <strong>{{ player.name }}</strong> -->
+    </div>
+
+    <button
+      class="btn btn-primary mt-3"
+      @click="endTurn"
+      :disabled="!allSet || totalTaken !== game.currentCards"
+    >
+      Termina turno
+    </button>
+
+    <p v-if="totalTaken !== game.currentCards && allSet">
+      ⚠ La somma delle prese deve essere pari al numero di carte del turno ({{
+        game.currentCards
+      }})
     </p>
-
-    <div>
-      <button @click="game.setResult(player.id, true)">✔ Giusto</button>
-
-      <button @click="game.setResult(player.id, false)">✖ Sbagliato</button>
-    </div>
-
-    <!-- SOLO SE SBAGLIATO -->
-    <div v-if="player.resultCorrect === false">
-      <label>
-        Prese fatte:
-        <input
-          type="number"
-          min="0"
-          :max="game.currentCards"
-          v-model.number="player.taken"
-        />
-      </label>
-    </div>
-
-    <!-- FEEDBACK -->
-    <p v-if="player.resultCorrect === true">✅ Presa giusta</p>
-    <p v-if="player.resultCorrect === false">❌ Presa sbagliata</p>
   </div>
-
-  <button
-    @click="endTurn"
-    :disabled="!allSet || totalTaken !== game.currentCards"
-  >
-    Termina turno
-  </button>
-
-  <p v-if="totalTaken !== game.currentCards && allSet">
-    ⚠ La somma delle prese deve essere pari al numero di carte del turno ({{
-      game.currentCards
-    }})
-  </p>
 </template>
