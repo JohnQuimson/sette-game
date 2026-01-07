@@ -1,180 +1,164 @@
 import { defineStore } from 'pinia';
 
 export const useGameStore = defineStore('game', {
-  state: () => ({
-    playersCount: 0,
-    players: [],
+   state: () => ({
+      playersCount: 0,
+      players: [],
 
-    cardsToRemove: [],
+      cardsToRemove: [],
 
-    turns: [], // es: [7,6,5,4,3,2,1,1,2,3,4,5,6,7]
-    currentTurnIndex: 0,
+      turns: [], // es: [7,6,5,4,3,2,1,1,2,3,4,5,6,7]
+      currentTurnIndex: 0,
 
-    firstDealerIndex: null,
-  }),
+      firstDealerIndex: null,
+   }),
 
-  getters: {
-    // ---- TURNI ----
-    currentCards(state) {
-      return state.turns[state.currentTurnIndex];
-    },
+   getters: {
+      // ---- TURNI ----
+      currentCards(state) {
+         return state.turns[state.currentTurnIndex];
+      },
 
-    currentTurnNumber(state) {
-      return state.currentTurnIndex + 1;
-    },
+      currentTurnNumber(state) {
+         return state.currentTurnIndex + 1;
+      },
 
-    isGameFinished(state) {
-      return state.currentTurnIndex >= state.turns.length;
-    },
+      isGameFinished(state) {
+         return state.currentTurnIndex >= state.turns.length;
+      },
 
-    // ---- DEALER ----
-    currentDealerIndex(state) {
-      if (state.firstDealerIndex === null) return null;
-      return (
-        (state.firstDealerIndex + state.currentTurnIndex) % state.players.length
-      );
-    },
+      // ---- DEALER ----
+      currentDealerIndex(state) {
+         if (state.firstDealerIndex === null) return null;
+         return (state.firstDealerIndex + state.currentTurnIndex) % state.players.length;
+      },
 
-    currentDealerId(state) {
-      return state.players[this.currentDealerIndex]?.id;
-    },
+      currentDealerId(state) {
+         return state.players[this.currentDealerIndex]?.id;
+      },
 
-    currentDealerName(state) {
-      return state.players[this.currentDealerIndex]?.name;
-    },
+      currentDealerName(state) {
+         return state.players[this.currentDealerIndex]?.name;
+      },
 
-    firstDealerName(state) {
-      return state.players[state.firstDealerIndex]?.name;
-    },
+      firstDealerName(state) {
+         return state.players[state.firstDealerIndex]?.name;
+      },
 
-    // ---- DICHIARAZIONE VIETATA DEALER ----
-    forbiddenDealerDeclaration(state) {
-      const totalDeclared = state.players.reduce(
-        (sum, p) => sum + (p.declared ?? 0),
-        0
-      );
+      // ---- DICHIARAZIONE VIETATA DEALER ----
+      forbiddenDealerDeclaration(state) {
+         const dealerId = state.currentDealerId;
 
-      return this.currentCards - totalDeclared;
-    },
+         const sumOthers = state.players
+            .filter((p) => p.id !== dealerId)
+            .reduce((sum, p) => sum + (p.declared ?? 0), 0);
 
-    // ---- CLASSIFICA ----
-    ranking(state) {
-      return [...state.players].sort((a, b) => b.points - a.points);
-    },
-  },
+         return state.currentCards - sumOthers;
+      },
+      // ---- CLASSIFICA ----
+      ranking(state) {
+         return [...state.players].sort((a, b) => b.points - a.points);
+      },
+   },
 
-  actions: {
-    // -------------------------
-    // SETUP INIZIALE
-    // -------------------------
-    setPlayersCount(count) {
-      this.playersCount = count;
-    },
+   actions: {
+      // -------------------------
+      // SETUP INIZIALE
+      // -------------------------
+      setPlayersCount(count) {
+         this.playersCount = count;
+      },
 
-    calculateCardsToRemove() {
-      const totalCards = 52;
-      const used = this.playersCount * 7 + 1; // + briscola
-      const toRemove = totalCards - used;
+      calculateCardsToRemove() {
+         const totalCards = 52;
+         const used = this.playersCount * 7 + 1; // + briscola
+         const toRemove = totalCards - used;
 
-      const fullQuads = Math.floor(toRemove / 4);
+         const fullQuads = Math.floor(toRemove / 4);
 
-      const values = [
-        '2',
-        '3',
-        '4',
-        '5',
-        '6',
-        '7',
-        '8',
-        '9',
-        '10',
-        'J',
-        'Q',
-        'K',
-        'A',
-      ];
-      this.cardsToRemove = values.slice(0, fullQuads);
-    },
+         const values = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
+         this.cardsToRemove = values.slice(0, fullQuads);
+      },
 
-    setPlayers(names) {
-      this.players = names.map((name, index) => ({
-        id: index,
-        name,
-        points: 0,
-        declared: 0,
-        taken: null,
-        resultCorrect: null,
-      }));
-    },
+      setPlayers(names) {
+         this.players = names.map((name, index) => ({
+            id: index,
+            name,
+            points: 0,
+            declared: 0,
+            taken: null,
+            resultCorrect: null,
+         }));
+      },
 
-    extractFirstDealer() {
-      this.firstDealerIndex = Math.floor(Math.random() * this.players.length);
-    },
+      extractFirstDealer() {
+         this.firstDealerIndex = Math.floor(Math.random() * this.players.length);
+      },
 
-    startGame() {
-      this.turns = [7, 6, 5, 4, 3, 2, 1, 1, 2, 3, 4, 5, 6, 7];
-      this.currentTurnIndex = 0;
-    },
+      startGame() {
+         this.turns = [7, 6, 5, 4, 3, 2, 1, 1, 2, 3, 4, 5, 6, 7];
+         this.currentTurnIndex = 0;
+      },
 
-    // -------------------------
-    // DICHIARAZIONI
-    // -------------------------
-    setDeclaration(playerId, value) {
-      const player = this.players.find((p) => p.id === playerId);
-      if (!player) return;
+      // -------------------------
+      // DICHIARAZIONI
+      // -------------------------
+      setDeclaration(playerId, value) {
+         const player = this.players.find((p) => p.id === playerId);
+         if (!player) return;
 
-      // controllo dealer
-      if (playerId === this.currentDealerId) {
-        if (value === this.forbiddenDealerDeclaration) return;
-      }
+         // controllo dealer
+         if (playerId === this.currentDealerId) {
+            if (value === this.forbiddenDealerDeclaration) return;
+         }
 
-      player.declared = value;
-    },
+         player.declared = value;
+      },
 
-    // -------------------------
-    // RISULTATI TURNO
-    // -------------------------
-    setResult(playerId, correct) {
-      const player = this.players.find((p) => p.id === playerId);
-      if (!player) return;
+      // -------------------------
+      // RISULTATI TURNO
+      // -------------------------
+      setResult(playerId, correct) {
+         const player = this.players.find((p) => p.id === playerId);
+         if (!player) return;
 
-      player.resultCorrect = correct;
+         player.resultCorrect = correct;
 
-      if (correct) {
-        player.taken = player.declared;
-      } else {
-        player.taken = null;
-      }
-    },
+         if (correct) {
+            player.taken = player.declared;
+         } else {
+            player.taken = null;
+         }
+      },
 
-    // quando chiudi un turno
-    closeTurn() {
-      this.players.forEach((player) => {
-        let pointsThisTurn = 0;
+      // quando chiudi un turno
+      closeTurn() {
+         this.players.forEach((player) => {
+            let pointsThisTurn = 0;
 
-        if (player.resultCorrect) {
-          pointsThisTurn = 10 + player.declared;
-        } else {
-          pointsThisTurn = player.taken ?? 0;
-        }
+            if (player.resultCorrect) {
+               pointsThisTurn = 10 + player.declared;
+            } else {
+               pointsThisTurn = player.taken ?? 0;
+            }
 
-        // salva punti per questo turno
-        if (!player.turns) player.turns = [];
-        player.turns[this.currentTurnIndex] = pointsThisTurn;
+            // salva punti per questo turno
+            if (!player.turns) player.turns = [];
+            player.turns[this.currentTurnIndex] = pointsThisTurn;
 
-        // reset dichiarazioni
-        player.declared = 0;
-        player.taken = null;
-        player.resultCorrect = null;
-      });
+            // reset dichiarazioni
+            player.declared = 0;
+            player.taken = null;
+            player.resultCorrect = null;
+         });
 
-      this.currentTurnIndex++;
-    },
-    // -------------------------
-    // RESET
-    // -------------------------
-    resetGame() {
-      this.$reset();
-    },
-  },
+         this.currentTurnIndex++;
+      },
+      // -------------------------
+      // RESET
+      // -------------------------
+      resetGame() {
+         this.$reset();
+      },
+   },
 });

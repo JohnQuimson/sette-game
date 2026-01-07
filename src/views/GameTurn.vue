@@ -1,22 +1,12 @@
 <template>
-  <div class="container py-5">
-    <h2 class="mb-3">Turno {{ game.currentTurnNumber }}</h2>
+   <div class="container py-5">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+         <h2 class="mb-3">{{ game.currentCards }} Carte - {{ game.currentDealerName }}</h2>
+         <button class="btn btn-success" @click="goDeclarations">Vai alle dichiarazioni</button>
+      </div>
 
-    <div class="mb-3">
-      <p>
-        Carte per giocatore: <strong>{{ game.currentCards }}</strong>
-      </p>
-      <p>
-        Dealer: <strong>{{ game.currentDealerName }}</strong>
-      </p>
-    </div>
-
-    <ScoreTable />
-
-    <button class="btn btn-primary mt-3" @click="goDeclarations">
-      Vai alle dichiarazioni
-    </button>
-  </div>
+      <ScoreTable />
+   </div>
 </template>
 
 <script setup>
@@ -28,6 +18,6 @@ const router = useRouter();
 const game = useGameStore();
 
 function goDeclarations() {
-  router.push('/declarations');
+   router.push('/declarations');
 }
 </script>
