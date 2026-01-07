@@ -88,6 +88,8 @@ export const useGameStore = defineStore('game', {
             declared: 0,
             taken: null,
             resultCorrect: null,
+            turns: [],
+            turnsCorrect: [],
          }));
       },
 
@@ -135,18 +137,23 @@ export const useGameStore = defineStore('game', {
       closeTurn() {
          this.players.forEach((player) => {
             let pointsThisTurn = 0;
+            let correct = false;
 
-            if (player.resultCorrect) {
+            if (player.resultCorrect === true) {
                pointsThisTurn = 10 + player.declared;
+               correct = true;
             } else {
                pointsThisTurn = player.taken ?? 0;
+               correct = false;
             }
 
-            // salva punti per questo turno
-            if (!player.turns) player.turns = [];
+            // salva punti del turno
             player.turns[this.currentTurnIndex] = pointsThisTurn;
 
-            // reset dichiarazioni
+            // salva ESITO del turno (NUOVO)
+            player.turnsCorrect[this.currentTurnIndex] = correct;
+
+            // reset campi temporanei
             player.declared = 0;
             player.taken = null;
             player.resultCorrect = null;
@@ -154,6 +161,7 @@ export const useGameStore = defineStore('game', {
 
          this.currentTurnIndex++;
       },
+
       // -------------------------
       // RESET
       // -------------------------

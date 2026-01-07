@@ -26,26 +26,33 @@ function startGame() {
 
 <template>
    <div class="container py-5">
-      <h2 class="mb-5">Inserisci i giocatori</h2>
+      <h2 class="mb-5">Nomi Giocatori</h2>
 
       <!-- 👥 NOMI -->
       <div v-for="(n, i) in names" :key="i">
          <input v-model="names[i]" placeholder="Nome giocatore" class="form-control mb-2" />
       </div>
 
-      <button class="btn btn-primary mt-3" @click="extractDealer">🎲 Estrai dealer</button>
+      <button v-if="!game.firstDealerName" class="btn btn-primary mt-3" @click="extractDealer">🎲 Estrai dealer</button>
 
       <p v-if="extracting">Estrazione in corso...</p>
 
-      <div v-if="game.firstDealerName">
-         <p>
-            Dealer estratto: <strong>{{ game.firstDealerName }}</strong>
+      <div class="mt-5" v-if="game.firstDealerName">
+         <p class="fs-3">
+            Il Dealer è: <strong>{{ game.firstDealerName }}</strong>
          </p>
-         <button class="btn btn-success" :disabled="!game.firstDealerName" @click="startGame">Inizia a giocare</button>
+         <div class="d-flex align-items-center gap-3">
+            <button class="btn btn-success" :disabled="!game.firstDealerName" @click="startGame">
+               Inizia a giocare
+            </button>
+            o
+            <button class="btn btn-primary" @click="extractDealer">🎲 Estrai di nuovo</button>
+         </div>
+         <!-- <button class="btn btn-success" :disabled="!game.firstDealerName" @click="startGame">Inizia a giocare</button> -->
       </div>
 
       <!-- 🃏 CARTE DA TOGLIERE -->
-      <div class="alert alert-danger mt-3" v-if="game.cardsToRemove.length">
+      <div class="alert alert-danger mt-5" v-if="game.cardsToRemove.length">
          Carte da togliere: {{ game.cardsToRemove.join(', ') }}
       </div>
    </div>
