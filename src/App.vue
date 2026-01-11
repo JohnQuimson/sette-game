@@ -1,7 +1,25 @@
-<script setup></script>
+<script setup>
+import Footer from '@/components/Footer.vue';
+</script>
 
 <template>
-  <router-view></router-view>
+  <div class="layout">
+    <router-view />
+    <Footer />
+  </div>
 </template>
 
-<style scoped></style>
+<style>
+html,
+body,
+#app {
+  height: 100%;
+  margin: 0;
+}
+
+.layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+</style>
