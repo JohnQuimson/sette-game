@@ -14,7 +14,7 @@ html,
 body,
 #app {
   height: 100%;
-  margin: 0;
+  margin: 0px;
 }
 
 .layout {
