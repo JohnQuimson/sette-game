@@ -133,7 +133,7 @@ function prevDeclaration() {
                         class="btn btn-outline-secondary btn-lg flex-grow-1"
                         @click="prevDeclaration"
                      >
-                        ⬅️ Indietro
+                        < Indietro
                      </button>
 
                      <button
@@ -141,7 +141,7 @@ function prevDeclaration() {
                         :disabled="isDealerInvalid || declarationValue < 0 || declarationValue > game.currentCards"
                         @click="nextDeclaration"
                      >
-                        {{ activePlayerIndex === declarationOrder.length - 1 ? 'Termina e Gioca' : 'Avanti ➡️' }}
+                        {{ activePlayerIndex === declarationOrder.length - 1 ? 'Termina e Gioca' : 'Avanti >' }}
                      </button>
                   </div>
 

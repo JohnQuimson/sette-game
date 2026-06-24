@@ -174,7 +174,7 @@ function endTurn() {
                </div>
 
                <div class="modal-content py-4 px-4 text-center">
-                  <p class="fs-5 mb-1">Com'è andato il turno di:</p>
+                  <p class="fs-5 mb-1">Turno di:</p>
                   <h2 class="fw-bold text-uppercase text-success mb-2">
                      {{ currentPlayer?.name }}
                   </h2>
@@ -185,14 +185,14 @@ function endTurn() {
                   <hr />
 
                   <div v-if="currentPlayer?.resultCorrect === null" class="d-flex gap-3 justify-content-center my-4">
+                     <button class="btn btn-danger btn-lg px-4" @click="setWrong">Sbagliato</button>
                      <button class="btn btn-success btn-lg px-4" @click="setCorrect">
-                        ✔ Giusto ({{ currentPlayer?.declared }})
+                        Giusto ({{ currentPlayer?.declared }})
                      </button>
-                     <button class="btn btn-danger btn-lg px-4" @click="setWrong">✖ Sbagliato</button>
                   </div>
 
                   <div v-else-if="currentPlayer?.resultCorrect === false" class="my-4 mx-auto" style="max-width: 200px">
-                     <label class="form-label fw-bold text-danger">Prese effettivamente fatte:</label>
+                     <label class="form-label fw-bold text-danger">Prese fatte:</label>
                      <input
                         type="number"
                         inputmode="numeric"
@@ -211,15 +211,15 @@ function endTurn() {
                         "
                         @click="confirmWrongAndNext"
                      >
-                        Conferma prese ➡️
+                        Conferma prese
                      </button>
                      <small v-if="currentPlayer.taken === currentPlayer.declared" class="text-danger d-block mt-1">
-                        Se ha sbagliato, non può aver fatto {{ currentPlayer.declared }} prese!
+                        Non puoi aver fatto {{ currentPlayer.declared }} prese
                      </small>
                   </div>
 
                   <div v-else class="my-4 text-success fw-bold fs-4">
-                     ✅ Ha indovinato! (Prese: {{ currentPlayer.taken }})
+                     Corretto
                      <button
                         class="btn btn-sm btn-outline-secondary d-block mx-auto mt-2"
                         @click="currentPlayer.resultCorrect = null"
@@ -230,7 +230,7 @@ function endTurn() {
 
                   <div class="d-flex justify-content-between border-top pt-3 mt-3">
                      <button class="btn btn-sm btn-secondary" :disabled="activePlayerIndex === 0" @click="prevStep">
-                        ⬅️ Prec.
+                        < Prec.
                      </button>
 
                      <span class="text-muted align-self-center small">
@@ -245,7 +245,7 @@ function endTurn() {
                         "
                         @click="nextStep"
                      >
-                        {{ activePlayerIndex === playOrder.length - 1 ? 'Vedi Riepilogo 🏁' : 'Prossimo ➡️' }}
+                        {{ activePlayerIndex === playOrder.length - 1 ? 'Vedi Riepilogo 🏁' : 'Prossimo >' }}
                      </button>
                   </div>
 
